@@ -121,6 +121,7 @@ int main(void) {
 			} else printf("Line %d: Wrong/Missing prefix for Register Count.\n", current_line);
 		}
 		current_line++;
+
 	}
 	return 0;
 }
