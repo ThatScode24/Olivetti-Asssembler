@@ -20,6 +20,32 @@ The "C" stands for **Commodore**, the company that became synonymous with person
 ### 6502: **MOS Technology 6502 Microprocessor**
 The **6502** was a revolutionary **8-bit microprocessor** introduced in 1975 by **MOS Technology**, which played a pivotal role in the development of affordable personal computers. This project is inspired by the logic of the 6502 processor, particularly its low-cost design, simple architecture, and efficient instruction set, all of which made it a dominant force in early computing systems, powering devices like the Apple I, Atari systems, and Commodore products.
 
----
+## Project Overview
 
-In summary, **A5BAL8P101-C6502** encapsulates the spirit of 1970s computing by drawing influence from several groundbreaking devices and companies of that era. From the **Olivetti Audit 5** and **Programma 101** to **Commodore** and the **6502 processor**, the architecture reflects a retro design that integrates key aspects of hardware and software development during the dawn of personal computing.
+This project includes two major components:
+
+- **An Emulator**: The emulator simulates the architecture of the A5BAL8P101-C6502 system, allowing users to run and test code as if it were on the original hardware. This emulator faithfully models the retro, 8-bit environment, handling instructions, memory, and registers according to the project’s custom architecture.
+  
+- **An Assembler**: The assembler takes code written in the project-specific assembly language and translates it into machine code that can be executed by the emulator. The assembler parses the instructions, registers, and constants, converting them into the correct binary format for execution.
+
+## Syntax
+
+The project introduces a unique assembly syntax that mirrors the minimalist style of early computers while introducing special notations to help manage registers and constants.
+
+- **Mnemonic (Instruction) First**: Instructions are always written first in the syntax, followed by their operands.
+  
+- **Registers**: Registers are referred to using the `%` symbol, which is followed by the register’s name.
+  - Example: `%RA` refers to the auxillary register.
+
+- **Constants**: When referencing a constant value, use the `$` symbol to indicate a literal numeric value.
+  - Example: `$10` refers to the constant value `10`.
+
+- **Register Count**: When using special instructions like `LRZ` or `LZ`, which reset registers, the `~` symbol is used to indicate the number of target registers.
+  - Example: `~3` refers to reseting 3 registers
+
+### Example Code:
+
+```assembly
+LR %09, $10    ; Load the constant 10 into register 9
+LAX %15        ; Move the content of register 15 in the Auxillary Register (RA)
+LRZ ~5         ; Resets 5 registers
