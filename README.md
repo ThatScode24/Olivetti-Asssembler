@@ -46,6 +46,6 @@ The project introduces a unique assembly syntax that mirrors the minimalist styl
 ### Example Code:
 
 ```assembly
-LR %09, $10    ; Load the constant 10 into register 9
+LI %09, $10    ; Load the constant 10 into register 9
 LAX %15        ; Move the content of register 15 in the Auxillary Register (RA)
 LRZ ~5         ; Resets 5 registers
