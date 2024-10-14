@@ -1,4 +1,4 @@
-# A5BAL8P101-C6502
+# A5BAL8P101-C6502 | Work in Progress
 
 ## Explanation of the Title
 
@@ -22,11 +22,12 @@ The **6502** was a revolutionary **8-bit microprocessor** introduced in 1975 by 
 
 ## Project Overview
 
-This project includes two major components:
+This project includes three major components:
 
-- **An Emulator**: The emulator simulates the architecture of the A5BAL8P101-C6502 system, allowing users to run and test code as if it were on the original hardware. This emulator faithfully models the retro, 8-bit environment, handling instructions, memory, and registers according to the project’s custom architecture.
+- **An Emulator**: The emulator simulates the architecture of the A5BAL8P101-C6502 system. This emulator faithfully models the retro, 8-bit environment, handling instructions, memory, and registers according to the project’s custom architecture.
   
 - **An Assembler**: The assembler takes code written in the project-specific assembly language and translates it into machine code that can be executed by the emulator. The assembler parses the instructions, registers, and constants, converting them into the correct binary format for execution.
+- **A Custom Assembly Language**
 
 ## Syntax
 
