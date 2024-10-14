@@ -1,0 +1,14 @@
+======Registers======
+
+
+Numerical, General-Purpose, 8 bit Registers |  0, 1 ... 15  | 0x00, 0x01 ... 0x0F
+I/O 8 bit Registers                         |  M, A, R      | 0x13, 0x14, 0x15
+Auxilliary 8 bit Register                   |  RA           | 0x11
+Write Register 8 bit ( Input )              |  WR           | 0x10
+Condition Register ( Flags )                |  CR   	    | 0x12
+
+
+
+======Mnemonics&Opcodes======
+
+

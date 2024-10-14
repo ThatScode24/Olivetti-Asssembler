@@ -1,0 +1,15 @@
+# De la vscode
+.vscode/ 
+
+# De la Assembler
+
+*.bin
+*.out
+*.o
+
+# De la vim 
+*.swp 
+*.un~ 
+*.vim 
+*.swo 
+*~ 
