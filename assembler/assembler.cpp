@@ -1,8 +1,7 @@
 /*  
 
 -> De adaugat suport pentru registri alfanumerici (dar si compatibilitati) exact cum e in Emulator.cpp in VS.
--> Trebuie verificata validitatea registrilor (cumva cu alta functie in manip.cpp)
- ( eventual sa am un array cu un offset de 0xF indexat fix ca in CPU.h, sa verific eficient validitatea registrului )
+-> De adaugat suport pentru registri scris in litere mici (de ex, merge cu RA dar nu cu ra)
 
 
 Nume: Olivetti A5BAL8/P101-C6502
@@ -120,8 +119,34 @@ int main(void) {
 				}
 			} else printf("Line %d: Wrong/Missing prefix for Register Count.\n", current_line);
 		}
-		current_line++;
+		
+		else if ( mnemonic == "ARI" || mnemonic == "ari" ) {
+			if( manip::validate_expression(token[1], '%') || manip::validate_expression(token[2], '$') ) {
+				int Register = manip::validate_register(manip::remove_occurences(token[1], '%'));
+				int Constant; 
+				if(Register != -1) {
+					if(Register == 0x12 || Register == 0x10) printf("Line %d: Cannot execute ARI on this register.\n", current_line);
+					else {
+						try {
+							Constant = std::stoi( manip::remove_occurences(token[2], '$') );
+							if( manip::validate_constant(Constant) ) {
+								toWrite.push_back(0x09);    // opcode instructiune LI 
+								toWrite.push_back(Register);
+								toWrite.push_back(Constant);
 
+								manip::write_binary(toWrite);
+
+								//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
+							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
+						} catch( const std::invalid_argument& arg ) {
+							printf("Line %d: Expected an integer.\n", current_line);   // daca ajungem aici, nu era o constanta
+						}
+					}
+				} else printf("Line %d: Register does not exist.\n", current_line);
+
+			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
+		}
+		current_line++;
 	}
 	return 0;
 }
