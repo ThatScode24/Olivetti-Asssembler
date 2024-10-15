@@ -17,6 +17,7 @@ namespace manip {
     void write_binary(const std::vector<std::uint8_t>& vec);
     void init_binary();
     int find_index(const std::string &elem, const std::vector<std::string>& vec);
+    std::string toUpperCase(std::string str);
 }
 
 #endif

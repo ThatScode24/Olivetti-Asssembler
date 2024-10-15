@@ -32,14 +32,22 @@ int manip::find_index(const std::string &elem, const std::vector<std::string>& v
 	return (it != vec.end()) ? std::distance(vec.begin(), it) + 0x10 : -1;
 }
 
+std::string manip::toUpperCase(std::string str) {
+    std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+    return str;
+}
+
 int manip::validate_register( const std::string &Register) {
 	std::vector<std::string> Regs = {"WR", "RA", "CR", "M", "A", "R"};
 	
+
 	try{
 		int reg = std::stoi(Register);
 		if(reg >=0 && reg <=15) return reg;
 	} catch( const std::invalid_argument& arg ) {
-		return manip::find_index(Register, Regs);   
+		std::string final_reg = manip::toUpperCase(Register);
+		return manip::find_index(final_reg, Regs);   
 	}
 	return -1;
 }
+
