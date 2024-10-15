@@ -64,7 +64,7 @@ LI %RR, $KK
 
 Loads a *value* into a *Regiter*.
 
-`RR` is any register except `CR` (0x12) and `WR` (0x10).
+`RR` is any register except `CR` (0x12) and `WR` (0x10).  
 `KK` is a 8 bit positive constant (0 % 255).
 
 ### 2. **PR (PRINT REGISTER)**
