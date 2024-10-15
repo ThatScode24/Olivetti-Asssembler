@@ -4,6 +4,7 @@
 # De la Assembler
 
 *.bin
+*.exe
 *.out
 *.o
 

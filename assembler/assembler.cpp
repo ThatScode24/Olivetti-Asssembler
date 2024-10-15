@@ -1,8 +1,10 @@
 /*  
 
 -> De adaugat suport pentru registri alfanumerici (dar si compatibilitati) exact cum e in Emulator.cpp in VS.
--> De adaugat suport pentru registri scris in litere mici (de ex, merge cu RA dar nu cu ra)
-
+-> De adaugat suport pentru registri scris in litere mici (de ex, merge cu RA dar nu cu ra)                              OK
+-> should try to minimise try catch blocks 
+-> should implement all of the condition checking directly in the assembler
+-> should include details about instructions in readme
 
 Nume: Olivetti A5BAL8/P101-C6502
 
@@ -49,6 +51,7 @@ int main(void) {
 		std::string mnemonic = token[0];    //     fiecare rand are pe prima pozitie mnemonic
 	
 		std::vector<std::uint8_t> toWrite = {};
+		
 		if( mnemonic == "LI" || mnemonic == "li" ) {
 			if( manip::validate_expression(token[1], '%') && manip::validate_expression(token[2], '$') ) {
 				int Register = manip::validate_register( manip::remove_occurences(token[1], '%') );		

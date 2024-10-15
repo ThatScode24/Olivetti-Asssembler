@@ -50,3 +50,28 @@ The project introduces a unique assembly syntax that mirrors the minimalist styl
 LI %09, $10    ; Load the constant 10 into register 9
 LAX %15        ; Move the content of register 15 in the Auxillary Register (RA)
 LRZ ~5         ; Resets 5 registers
+```
+
+
+## Instructions
+
+### 1. **LI (Load Integer)**
+
+**Syntax:**
+```asm
+LI %RR, $KK
+```
+
+Loads a *value* into a *Regiter*.
+
+`RR` is any register except `CR` (0x12) and `WR` (0x10).
+`KK` is a 8 bit positive constant (0 % 255).
+
+### 2. **PR (PRINT REGISTER)**
+
+**Syntax:**
+```asm
+PR %RR
+```
+
+`RR` is any register. 
