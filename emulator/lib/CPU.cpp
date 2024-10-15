@@ -62,11 +62,9 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 			Byte Register = Fetch(NumCycles, memorie);   // registrul cu care vom lucra
 			Byte Constant = Fetch(NumCycles, memorie);  // constanta de care avem nevoie
 
-			if (Register >= 0 && Register <= 21 && Register != 0x12 && Register != 0x10) {  // verificam daca registru nu este WR sau CR 
-				*Regs[Register] = Constant;
-				SET_FLAGS_LI(Register);
-			}
-			else printf("Cannot load constant into this register.");
+			//   verificam ca registri sunt corecti in assembler pentru motive de performanta
+			*Regs[Register] = Constant;
+			SET_FLAGS_LI(Register);
 		} break;
 
 		case INSTRUCTION_RMC:                          //       Load into RR value at 0x....
@@ -89,8 +87,7 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 		case INSTRUCTION_LAX:                         //        Trasferisce dal Registro RR (numerico) al Registro Ausiliario.
 		{
 			Byte Register = Fetch(NumCycles, memorie);
-			if (Register >= 0 && Register <= 15) { RA = *Regs[Register]; SET_FLAGS_LI(Register); }   // setem RR = Aux reg 
-			else printf("Cannot perform LAX.");
+			RA = *Regs[Register]; SET_FLAGS_LI(Register);    // setem RR = Aux reg 
 		} break;
 
 		case INSTRUCTION_LCR:                         //         Scambia il contenuto di due registri.
@@ -122,8 +119,7 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 		case INSTRUCTION_SAX:                      //              Trasferisce dal Registro Ausiliario al Registro RR (numerico).
 		{
 			Byte Register = Fetch(NumCycles, memorie);
-			if (Register >= 0 && Register <= 15) { *Regs[Register] = RA; SET_FLAGS_LI(Register); }   // setem RR = Aux reg 
-			else printf("Cannot perform SAX.");
+			*Regs[Register] = RA; SET_FLAGS_LI(Register);    // setem RR = Aux reg 
 		} break;
 
 		case INSTRUCTION_LRZ:                     //               Azzera nn + 1 registri.
@@ -148,11 +144,7 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 		{
 			Byte Register = Fetch(NumCycles, memorie);
 			Byte Constant = Fetch(NumCycles, memorie);
-
-			if (Register!=0x12 && Register !=0x10) {    //  toate fara WR si CR
-				*Regs[Register] += Constant;
-
-			} else printf("Unable to perform arithmetic operation on this register");
+			*Regs[Register] += Constant;
 		} break;
 
 		case INSTRUCTION_AR:
@@ -171,11 +163,7 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 		{
 			Byte Register = Fetch(NumCycles, memorie);
 			Byte Integer = Fetch(NumCycles, memorie);
-
-			if (Register != 0x12 && Register != 0x10) {
-				*Regs[Register] -= Integer;
-			}
-			else printf("Cannot perform arithmetic operation on these registers. ");
+			*Regs[Register] -= Integer;
 		} break; 
 
 		case INSTRUCTION_SR:
