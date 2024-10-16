@@ -102,11 +102,11 @@ SAX %RR
 
 ### 5. **LRZ (LOAD REGISTER ZERO)**
 
-*Resets* `NN-1` *registers*.
+*Resets* `NN+1` *registers*.
 
 **Syntax:**
 ```asm
 LRZ ~NN
 ```
-`NN` is the number of target registers-1.  
+`NN` is the number of target registers-1 ( 1 <= NN <= 20 )
 
