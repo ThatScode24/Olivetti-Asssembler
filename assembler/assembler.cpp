@@ -128,7 +128,7 @@ int main(void) {
 		}
 		
 		else if ( mnemonic == "ARI" || mnemonic == "ari" ) {
-			if( manip::validate_expression(token[1], '%') || manip::validate_expression(token[2], '$') ) {
+			if( manip::validate_expression(token[1], '%') && manip::validate_expression(token[2], '$') ) {
 				int Register = manip::validate_register(manip::remove_occurences(token[1], '%'));
 				int Constant; 
 				if(Register != -1) {
@@ -176,8 +176,24 @@ int main(void) {
 			} else printf("Line %d: Wrong/Missing prefix for Register Count/Register.\n", current_line);
 		}
 
+		else if( mnemonic == "SR" || mnemonic == "sr") {
+			if( manip::validate_expression(token[1], '%') && manip::validate_expression(token[2], '%') ) {
+				int Register1 = manip::validate_register( manip::remove_occurences(token[1], '%'));
+				int Register2 = manip::validate_register( manip::remove_occurences(token[2], '%'));
+
+				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", current_line);
+				else {
+					if ((Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) ||
+					((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
+					(Register2 == 0x11 || Register2 == 0x15 || Register2 == 0x14 || Register2 == 0x13))) {
+						continue;
+					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
+				}
+			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
+		}
+
 		else if ( mnemonic == "SRI" || mnemonic == "sri" ) {
-			if( manip::validate_expression(token[1], '%') || manip::validate_expression(token[2], '$') ) {
+			if( manip::validate_expression(token[1], '%') && manip::validate_expression(token[2], '$') ) {
 				int Register = manip::validate_register(manip::remove_occurences(token[1], '%'));
 				int Constant; 
 				if(Register != -1) {
@@ -204,7 +220,7 @@ int main(void) {
 		}
 		current_line++;
 	}
-	printf("merge cmake ba\n");
+	printf("Functions as normal.\n");
 	return 0;
 }
 

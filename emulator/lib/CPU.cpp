@@ -20,7 +20,7 @@ void CPU::Reset(Memory & memorie)      // Initializare
 	C = Z = V = N;   // am scos decimal flag 
 
 	// registri la 0
-	R_0 = R_1 = R_2 = R_3 = R_4 = R_5 = R_6 = R_7 = R_8 = R_9 = R_10 = R_11 = R_12 = R_13 = R_14 = R_15 = 0;
+	R_0 = R_1 = R_2 = R_3 = R_4 = R_5 = R_6 = R_7 = R_8 = R_9 = R_10 = R_11 = R_12 = R_13 = R_14 = R_15 = 2;
 
 	M = A = R = WR = RA = CR = 0;
 	

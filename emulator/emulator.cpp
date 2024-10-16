@@ -57,6 +57,7 @@
 #include <stdlib.h>
 #include "lib/memory.h"
 #include "lib/CPU.h"
+#include <iostream>
 
 
 int main(void) {
@@ -64,21 +65,11 @@ int main(void) {
 	Memory memorie;
 	CPU cpu;
 	cpu.Reset(memorie);
-	
-	memorie[0xFFF0] = 0x00;
-	memorie[0xFFF1] = 0x05;
-	memorie[0xFFF2] = 0x03;
-	memorie[0xFFF3] = 0x00;
-	memorie[0xFFF4] = 0x06;
-	memorie[0xFFF5] = 0x0A;
-	memorie[0xFFF6] = 0x09;
-	memorie[0xFFF7] = 0x06;
-	memorie[0xFFF8] = 0x04;
-	memorie[0xFFF9] = 0x0B;
-	memorie[0xFFFA] = 0x05;
-	memorie[0xFFFB] = 0x02;
+	memorie[0xFFF0] = CPU::INSTRUCTION_LRZ;
+	memorie[0xFFF1] = 0x14;
+
  
-	cpu.Exec(12, memorie);
+	cpu.Exec(2, memorie);
 	
 	cpu.Debug();
 
