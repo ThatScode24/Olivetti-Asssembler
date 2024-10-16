@@ -20,7 +20,7 @@ void CPU::Reset(Memory & memorie)      // Initializare
 	C = Z = V = N;   // am scos decimal flag 
 
 	// registri la 0
-	R_0 = R_1 = R_2 = R_3 = R_4 = R_5 = R_6 = R_7 = R_8 = R_9 = R_10 = R_11 = R_12 = R_13 = R_14 = R_15 = 2;
+	R_0 = R_1 = R_2 = R_3 = R_4 = R_5 = R_6 = R_7 = R_8 = R_9 = R_10 = R_11 = R_12 = R_13 = R_14 = R_15 = 0;
 
 	M = A = R = WR = RA = CR = 0;
 	
@@ -152,11 +152,7 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 			Byte Register1 = Fetch(NumCycles, memorie);
 			Byte Register2 = Fetch(NumCycles, memorie);
 
-			if ((Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) ||
-				((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
-					(Register2 == 0x11 || Register2 == 0x15 || Register2 == 0x14 || Register2 == 0x13))) {
-				*Regs[Register1] += *Regs[Register2];
-			} else printf("Cannot perform arithmetic operation on these registers. ");
+			*Regs[Register1] += *Regs[Register2];
 		} break;
 
 		case INSTRUCTION_SRI:      // se pare ca exista probleme de underflow. (e normal, am definite Byte = unsigned char)
@@ -171,12 +167,7 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 			Byte Register1 = Fetch(NumCycles, memorie);
 			Byte Register2 = Fetch(NumCycles, memorie);
 
-			if ((Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) ||
-				((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
-					(Register2 == 0x11 || Register2 == 0x15 || Register2 == 0x14 || Register2 == 0x13))) {
-				*Regs[Register1] -= *Regs[Register2];
-			}
-			else printf("Cannot perform arithmetic operation on these registers. ");
+			*Regs[Register1] -= *Regs[Register2];
 		}
 
 		default: printf("Instruction %d not handled.", Instruction);

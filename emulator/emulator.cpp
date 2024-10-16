@@ -65,11 +65,34 @@ int main(void) {
 	Memory memorie;
 	CPU cpu;
 	cpu.Reset(memorie);
-	memorie[0xFFF0] = CPU::INSTRUCTION_LRZ;
-	memorie[0xFFF1] = 0x14;
 
- 
-	cpu.Exec(2, memorie);
+	/*
+	
+	LI %10, $5    
+	LI %15, $10
+	AR %10, %15
+	LR %15, %10
+	LRZ ~14
+	
+	*/
+
+
+	memorie[0xFFF0] = 0x00;
+	memorie[0xFFF1] = 0x0A;    
+	memorie[0xFFF2] = 0x05;
+	memorie[0xFFF3] = 0x00;
+	memorie[0xFFF4] = 0x0F;
+	memorie[0xFFF5] = 0x0A;
+	memorie[0xFFF6] = 0x0A;
+	memorie[0xFFF7] = 0x0A;
+	memorie[0xFFF8] = 0x0F;
+	memorie[0xFFF9] = 0x05;
+	memorie[0xFFFA] = 0x00;
+	memorie[0xFFFB] = 0x0A;
+	memorie[0xFFFC] = 0x07;
+	memorie[0xFFFD] = 0x0F;
+	
+	cpu.Exec(14, memorie);
 	
 	cpu.Debug();
 

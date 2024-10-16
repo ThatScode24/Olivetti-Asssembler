@@ -11,7 +11,7 @@ std::string manip::remove_occurences(std::string expression, char caracter) {
 }
 
 void manip::write_binary(const std::vector<std::uint8_t>& vec) {
-	std::ofstream fout( "output.bin", std::ios::app );
+	std::ofstream fout( "output.bin",  std::ios::out | std::ios::binary | std::ios::app);
 
 	fout.write( reinterpret_cast<const char*>(vec.data()), vec.size() );   // ii dam cast la char* pentru ca char = 1 byte 
 	
@@ -19,7 +19,7 @@ void manip::write_binary(const std::vector<std::uint8_t>& vec) {
 }
 
 void manip::init_binary() {
-	std::ofstream fout( "output.bin", std::ios::binary );
+	std::ofstream fout( "output.bin", std::ios::out | std::ios::binary);
 	fout.close();
 }
 

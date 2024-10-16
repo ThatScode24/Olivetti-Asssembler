@@ -24,6 +24,7 @@ Makefile
 # De la Assembler
 
 *.bin
+*.h.gch
 *.exe
 *.out
 *.o

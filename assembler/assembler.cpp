@@ -1,10 +1,16 @@
 /*  
 
--> De adaugat suport pentru registri alfanumerici (dar si compatibilitati) exact cum e in Emulator.cpp in VS.
+-> De adaugat suport pentru registri alfanumerici (dar si compatibilitati) exact cum e in Emulator.cpp in VS.            OK
 -> De adaugat suport pentru registri scris in litere mici (de ex, merge cu RA dar nu cu ra)                              OK
 -> should try to minimise try catch blocks 
 -> should implement all of the condition checking directly in the assembler
 -> should include details about instructions in readme
+
+Probleme:
+
+-> de fiecare data cand e 0xA in toWrite, asta adauga un 0xD inainte                                                     OK
+era problema cu modul de deschidere a fisierului, il deschideam si la inceput si la append in text mode 
+
 
 Nume: Olivetti A5BAL8/P101-C6502
 
@@ -186,7 +192,51 @@ int main(void) {
 					if ((Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) ||
 					((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
 					(Register2 == 0x11 || Register2 == 0x15 || Register2 == 0x14 || Register2 == 0x13))) {
-						continue;
+						toWrite.push_back(0xC);
+						toWrite.push_back(Register1);
+						toWrite.push_back(Register2);
+
+						manip::write_binary(toWrite);
+					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
+				}
+			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
+		}
+
+		else if( mnemonic == "AR" || mnemonic == "ar") {
+			if( manip::validate_expression(token[1], '%') && manip::validate_expression(token[2], '%') ) {
+				int Register1 = manip::validate_register( manip::remove_occurences(token[1], '%'));
+				int Register2 = manip::validate_register( manip::remove_occurences(token[2], '%'));
+
+				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", current_line);
+				else {
+					if ((Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) ||
+					((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
+					(Register2 == 0x11 || Register2 == 0x15 || Register2 == 0x14 || Register2 == 0x13))) {
+						toWrite.push_back(0xA);
+						toWrite.push_back(Register1);
+						toWrite.push_back(Register2);
+
+						manip::write_binary(toWrite);
+					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
+				}
+			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
+		}
+
+		else if( mnemonic == "LR" || mnemonic == "lr") {
+			if( manip::validate_expression(token[1], '%') && manip::validate_expression(token[2], '%') ) {
+				int Register1 = manip::validate_register( manip::remove_occurences(token[1], '%'));
+				int Register2 = manip::validate_register( manip::remove_occurences(token[2], '%'));
+
+				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", current_line);
+				else {
+					if ( (Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) || 
+					((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
+				 	(Register2 == 0x11 || Register2 == 0x15 || Register2 == 0x14 || Register2 == 0x13))) {
+						toWrite.push_back(0x5);
+						toWrite.push_back(Register1);
+						toWrite.push_back(Register2);
+
+						manip::write_binary(toWrite);
 					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
 				}
 			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
