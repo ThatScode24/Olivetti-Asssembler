@@ -8,6 +8,8 @@
 
 Nume: Olivetti A5BAL8/P101-C6502
 
+
+cmake --build .
 */
 
 #include <iostream>
@@ -18,7 +20,7 @@ Nume: Olivetti A5BAL8/P101-C6502
 #include <sstream>
 #include <algorithm>
 #include <stdio.h>
-#include "lib/manip.h"
+#include "manip.h"
 
 
 int main(void) {
@@ -32,6 +34,8 @@ int main(void) {
 
 
 	while(std::getline(file, line)) {
+		if(line.empty()) continue;
+		
 		//         scoatem toate \n si \r care or exista
 		
 		line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
@@ -200,6 +204,7 @@ int main(void) {
 		}
 		current_line++;
 	}
+	printf("merge\n");
 	return 0;
 }
 
