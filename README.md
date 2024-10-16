@@ -55,23 +55,58 @@ LRZ ~5         ; Resets 5 registers
 
 ## Instructions
 
-### 1. **LI (Load Integer)**
+### 1. **LI (LOAD INTEGER)**
+
+*Loads* a *value* into a *Regiter*.  
 
 **Syntax:**
 ```asm
 LI %RR, $KK
 ```
 
-Loads a *value* into a *Regiter*.
-
 `RR` is any register except `CR` (0x12) and `WR` (0x10).  
 `KK` is a 8 bit positive constant (0 % 255).
 
 ### 2. **PR (PRINT REGISTER)**
+
+*Prints* the *content* of a *register*.
 
 **Syntax:**
 ```asm
 PR %RR
 ```
 
-`RR` is any register. 
+`RR` is any register.  
+
+### 3. **LAX (LOAD AUXILLARY)**
+
+*Loads* into `RA` the *value* in register `RR`.
+
+**Syntax:**
+```asm
+LAX %RR
+```
+`RR` is any register 0 % 15.  
+`RA` is the auxillary register. 
+
+### 4. **SAX (STORE AUXILLARY)**
+
+*Stores* into `RR` the *value* in register `RA`.
+
+**Syntax:**
+```asm
+SAX %RR
+```
+`RR` is any register 0 % 15.  
+`RA` is the auxillary register. 
+
+### 5. **LRZ (LOAD REGISTER ZERO)**
+
+*Resets* `NN-1` *registers*.
+
+**Syntax:**
+```asm
+LRZ ~NN
+```
+`NN` is the number of target registers-1.  
+

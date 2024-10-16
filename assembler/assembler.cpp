@@ -117,7 +117,7 @@ int main(void) {
 			if ( manip::validate_expression(token[1], '~') ) {
 				int Register_Count = std::stoi(manip::remove_occurences(token[1], '~'));
 				
-				if ( Register_Count <1 || Register_Count > 0x15) printf("Line %d: Invalid Register Logic.\n", current_line);
+				if ( Register_Count <1 || Register_Count > 0x14) printf("Line %d: Invalid Register Count Logic.\n", current_line);
 				else {
 					toWrite.push_back(0x07);
 					toWrite.push_back(Register_Count);
@@ -204,7 +204,7 @@ int main(void) {
 		}
 		current_line++;
 	}
-	printf("merge\n");
+	printf("merge cmake ba\n");
 	return 0;
 }
 
