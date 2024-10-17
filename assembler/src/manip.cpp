@@ -39,7 +39,6 @@ std::string manip::toUpperCase(std::string str) {
 
 int manip::validate_register( const std::string &Register) {
 	std::vector<std::string> Regs = {"WR", "RA", "CR", "M", "A", "R"};
-	
 
 	try{
 		int reg = std::stoi(Register);
@@ -51,3 +50,7 @@ int manip::validate_register( const std::string &Register) {
 	return -1;
 }
 
+std::string manip::removeComments(const std::string& linie) {
+	size_t pozitie = linie.find(';');
+	return (pozitie != std::string::npos) ? linie.substr(0, pozitie) : linie;
+}

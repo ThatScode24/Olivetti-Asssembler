@@ -18,6 +18,7 @@ namespace manip {
     void init_binary();
     int find_index(const std::string &elem, const std::vector<std::string>& vec);
     std::string toUpperCase(std::string str);
+    std::string removeComments(const std::string& linie);
 }
 
 #endif

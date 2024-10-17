@@ -1,19 +1,24 @@
 /*  
 
--> De adaugat suport pentru registri alfanumerici (dar si compatibilitati) exact cum e in Emulator.cpp in VS.            OK
--> De adaugat suport pentru registri scris in litere mici (de ex, merge cu RA dar nu cu ra)                              OK
+-> De adaugat suport pentru registri alfanumerici (dar si compatibilitati) exact cum e in Emulator.cpp in VS.                OK
+-> De adaugat suport pentru registri scris in litere mici (de ex, merge cu RA dar nu cu ra)                                  OK
 -> should try to minimise try catch blocks 
--> should implement all of the condition checking directly in the assembler
--> should include details about instructions in readme
+-> should implement all of the condition checking directly in the assembler                                                  OK
+-> should include details about instructions in readme               
 
 Probleme:
 
--> de fiecare data cand e 0xA in toWrite, asta adauga un 0xD inainte                                                     OK
+-> de fiecare data cand e 0xA in toWrite, asta adauga un 0xD inainte                                                         OK
 era problema cu modul de deschidere a fisierului, il deschideam si la inceput si la append in text mode 
 
 
 Nume: Olivetti A5BAL8/P101-C6502
 
+
+Asamblarea se face in 2 etape:                                                                                               OK
+
+-> prima scoate comentariile/liniile goale si pune liniile curate intr-un vector.
+-> a doua oara se proceseaza liniile si se scrie codul masina in fisierul binar.
 
 cmake --build .
 */
@@ -32,16 +37,21 @@ cmake --build .
 int main(void) {
 	std::ifstream file("code.txt");
 	std::regex comma(",");    
-	std::string line;          //   linie de cod 
+	std::string linie;          //   linie de cod 
 	std::string word;                    //     buffer pentru fiecare element din token 
+
+	std::vector<std::string> fara_com = {};
 
 	short current_line = 1;     // numarul liniei de cod
 	manip::init_binary();        //   cream o fila noua output.bin
 
-
-	while(std::getline(file, line)) {
+	while(std::getline(file, linie)) {
+		std::string linie_curata = manip::removeComments(linie);
+		if(!linie_curata.empty()) fara_com.push_back(linie_curata);
+	}
+	    
+	for(std::string& line : fara_com) {
 		if(line.empty()) continue;
-		
 		//         scoatem toate \n si \r care or exista
 		
 		line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
