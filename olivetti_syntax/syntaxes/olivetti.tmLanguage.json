@@ -1,0 +1,24 @@
+{
+    "scopeName": "source.olvasm",
+    "name": "A5BAL8 Olivetti Assembly",
+    "fileExtensions": [".olvasm"],
+    "patterns": [
+        {
+            "name": "comment.line.semicolon.olvasm",
+            "match": ";.*$"
+        },
+        {
+            "name": "keyword.instruction.olvasm",
+            "match": "\b(LI|PR|AR|LR|ARI|SR|SRI|RMC|LAX|SAX|LCR|LZ|LRZ)\b"
+        },
+        {
+            "name": "variable.parameter.register.olvasm",
+            "match": "%(0[0-9]|[1][0-5]|[M|A|R|RA|WR|CR])"
+        },
+        {
+            "name": "constant.numeric.olvasm",
+            "match": "^(25[0-5]|(2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9]))$"
+        }
+    ],
+    "repository": {}
+}

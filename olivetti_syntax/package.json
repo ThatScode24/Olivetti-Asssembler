@@ -1,0 +1,26 @@
+{
+    "name": "olivetti-assembly",
+    "displayName": "Olivetti 8bit Assembly",
+    "description": "Custom highlighting for Olivetti A5BAL8/P101-C6502",
+    "version": "0.0.1",
+    "publisher": "MF**",
+    "engines": {
+        "vscode": "^1.56.0"
+    },
+    "contributes": {
+        "languages": [
+            {
+                "id": "olivettiassembly",
+                "extensions": [".olvasm"],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "olivettiassembly",
+                "scopeName": "source.olvasm",
+                "path": "./syntaxes/olivetti.tmLanguage.json"
+            }
+        ]
+    }
+}

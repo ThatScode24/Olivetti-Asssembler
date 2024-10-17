@@ -35,7 +35,7 @@ cmake --build .
 
 
 int main(void) {
-	std::ifstream file("code.txt");
+	std::ifstream file("code.olvasm");
 	std::regex comma(",");    
 	std::string linie;          //   linie de cod 
 	std::string word;                    //     buffer pentru fiecare element din token 
@@ -280,7 +280,7 @@ int main(void) {
 		}
 		current_line++;
 	}
-	printf("Functions as normal.\n");
+	printf("merge.\n");
 	return 0;
 }
 
