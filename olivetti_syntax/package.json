@@ -12,7 +12,18 @@
             {
                 "id": "olivettiassembly",
                 "extensions": [".olvasm"],
-                "configuration": "./language-configuration.json"
+                "configuration": "./language-configuration.json",
+                "icon": {
+                    "light": "icons/olivetti.png",
+                    "dark": "icons/olivetti.png"
+                }
+            }
+        ],
+        "iconThemes": [
+            {
+                "id": "olivettiTheme",
+                "label": "Olivetti File Icon Theme.",
+                "path": "./icons/olibetti.png"
             }
         ],
         "grammars": [

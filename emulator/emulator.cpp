@@ -50,6 +50,9 @@
 => Add Register
 => Sintaxa AR RA, RB unde 0 <= RA <= RB <= 15 sau RA, RB apartin { M, A, R, RA } 
 
+																	========FD=======
+
+-> Genereaza K in WR 
 */
 
 
@@ -87,10 +90,10 @@ int main(void) {
 	memorie[0xFFF7] = 0x0A;
 	memorie[0xFFF8] = 0x0F;
 	memorie[0xFFF9] = 0x05;
-	memorie[0xFFFA] = 0x00;
+	memorie[0xFFFA] = 0x0F;
 	memorie[0xFFFB] = 0x0A;
 	memorie[0xFFFC] = 0x07;
-	memorie[0xFFFD] = 0x0F;
+	memorie[0xFFFD] = 0x0E;
 	
 	cpu.Exec(14, memorie);
 	

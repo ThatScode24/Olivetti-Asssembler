@@ -1,0 +1,10 @@
+{
+    "iconDefinitions": {
+      "olivettiIcon": {
+        "iconPath": "./icons/olivetti.png"
+      }
+    },
+    "fileExtensions": {
+      "mylang": "olivettiIcon"
+    }
+  }

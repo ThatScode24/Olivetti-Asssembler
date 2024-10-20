@@ -87,6 +87,8 @@ int main(void) {
 
 							manip::write_binary(toWrite);
 
+							manip::printVector(toWrite);
+
 							//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
 						} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
 					} catch( const std::invalid_argument& arg ) {
@@ -103,6 +105,7 @@ int main(void) {
 					toWrite.push_back(Register);
 
 					manip::write_binary(toWrite);
+					manip::printVector(toWrite);
 				} else printf("Line %d: Invalid Register.\n", current_line);
 			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
 		
@@ -114,6 +117,7 @@ int main(void) {
 					toWrite.push_back(Register);
 
 					manip::write_binary(toWrite);
+					manip::printVector(toWrite);
 				} else printf("Line %d: Cannot execute LAX instruction on this register.\n", current_line);
 			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
 		
@@ -125,6 +129,7 @@ int main(void) {
 					toWrite.push_back(Register);
 
 					manip::write_binary(toWrite);
+					manip::printVector(toWrite);
 				} else printf("Line %d: Cannot execute SAX instruction on this register.\n", current_line);
 			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
 		}
@@ -139,6 +144,8 @@ int main(void) {
 					toWrite.push_back(Register_Count);
 
 					manip::write_binary(toWrite);
+
+					manip::printVector(toWrite);
 				}
 			} else printf("Line %d: Wrong/Missing prefix for Register Count.\n", current_line);
 		}
@@ -158,6 +165,7 @@ int main(void) {
 								toWrite.push_back(Constant);
 
 								manip::write_binary(toWrite);
+								manip::printVector(toWrite);
 
 								//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
 							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
@@ -183,6 +191,7 @@ int main(void) {
 							toWrite.push_back(Next);
 
 							manip::write_binary(toWrite);
+							manip::printVector(toWrite);
 						}
 					} catch(const std::invalid_argument& arg) {
 						printf("Line %d: Expected an integer.\n", current_line);
@@ -207,6 +216,7 @@ int main(void) {
 						toWrite.push_back(Register2);
 
 						manip::write_binary(toWrite);
+						manip::printVector(toWrite);
 					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
 				}
 			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
@@ -227,6 +237,9 @@ int main(void) {
 						toWrite.push_back(Register2);
 
 						manip::write_binary(toWrite);
+
+
+						manip::printVector(toWrite);
 					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
 				}
 			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
@@ -247,6 +260,8 @@ int main(void) {
 						toWrite.push_back(Register2);
 
 						manip::write_binary(toWrite);
+
+						manip::printVector(toWrite);
 					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
 				}
 			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
@@ -267,7 +282,7 @@ int main(void) {
 								toWrite.push_back(Constant);
 
 								manip::write_binary(toWrite);
-
+								manip::printVector(toWrite);
 								//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
 							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
 						} catch( const std::invalid_argument& arg ) {
@@ -278,9 +293,46 @@ int main(void) {
 
 			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
 		}
+
+		else if( mnemonic == "LCR" || mnemonic == "lcr" ) {
+			if( manip::validate_expression(token[1], '%') && manip::validate_expression(token[2], '%') ) {
+				int Register1 = manip::validate_register(manip::remove_occurences(token[1], '%'));
+				int Register2 = manip::validate_register(manip::remove_occurences(token[2], '%'));
+
+				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", current_line);
+				else {
+					if ((Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) ||
+					((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
+					(Register2 == 0x11 || Register2 == 0x15 || Register2 == 0x14 || Register2 == 0x13))) {
+						toWrite.push_back(0x04);
+						toWrite.push_back(Register1);
+						toWrite.push_back(Register2);
+
+						manip::write_binary(toWrite);
+						manip::printVector(toWrite);
+
+					} else printf("Line %d: Wrong Register logic.\n", current_line);
+				}
+			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
+		}
+
+		
+		else if( mnemonic == "FD" || mnemonic == "fd" ) {
+			if( manip::validate_expression(token[1], '$')) {
+				int Constante = std::stoi( manip::remove_occurences(token[1], '$' ) );
+
+				if( manip::validate_constant(Constante) ) {
+					toWrite.push_back(0x0D);
+					toWrite.push_back(Constante);
+
+					manip::write_binary(toWrite);
+					manip::printVector(toWrite);
+				} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
+			} else printf("Line %d: Incorrect/Missing prefix for constant.\n", current_line);
+		}
+
 		current_line++;
 	}
-	printf("merge.\n");
 	return 0;
 }
 

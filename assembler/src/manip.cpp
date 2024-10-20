@@ -54,3 +54,11 @@ std::string manip::removeComments(const std::string& linie) {
 	size_t pozitie = linie.find(';');
 	return (pozitie != std::string::npos) ? linie.substr(0, pozitie) : linie;
 }
+
+
+void manip::printVector(const std::vector<std::uint8_t> &vec) {
+	for(const std::uint8_t &num : vec) {
+		printf("%d ", num);
+	}
+	printf("\n");
+}

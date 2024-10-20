@@ -109,11 +109,7 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 			Byte Register1 = Fetch(NumCycles, memorie);
 			Byte Register2 = Fetch(NumCycles, memorie);
 
-			if ( (Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) || 
-				((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
-				 (Register2 == 0x11 || Register2 == 0x15 || Register2 == 0x14 || Register2 == 0x13))) {
-				*Regs[Register1] = *Regs[Register2];
-			}
+			*Regs[Register1] = *Regs[Register2];
 		} break;
 
 		case INSTRUCTION_SAX:                      //              Trasferisce dal Registro Ausiliario al Registro RR (numerico).
@@ -168,6 +164,12 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 			Byte Register2 = Fetch(NumCycles, memorie);
 
 			*Regs[Register1] -= *Regs[Register2];
+		}
+
+		case INSTRUCTION_FD:
+		{
+			Byte Constante = Fetch(NumCycles, memorie);  
+			WR = Constante;
 		}
 
 		default: printf("Instruction %d not handled.", Instruction);
