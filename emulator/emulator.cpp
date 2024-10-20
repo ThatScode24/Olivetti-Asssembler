@@ -80,8 +80,9 @@ int main(void) {
 	*/
 
 
-	memorie[0xFFF0] = 0x00;
-	memorie[0xFFF1] = 0x0A;    
+	memorie[0xFFF0] = 0x0E;
+	memorie[0xFFF1] = 0x02;    
+	/*
 	memorie[0xFFF2] = 0x05;
 	memorie[0xFFF3] = 0x00;
 	memorie[0xFFF4] = 0x0F;
@@ -94,8 +95,8 @@ int main(void) {
 	memorie[0xFFFB] = 0x0A;
 	memorie[0xFFFC] = 0x07;
 	memorie[0xFFFD] = 0x0E;
-	
-	cpu.Exec(14, memorie);
+	*/
+	cpu.Exec(2, memorie);
 	
 	cpu.Debug();
 

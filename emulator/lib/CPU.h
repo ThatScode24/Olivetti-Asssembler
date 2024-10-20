@@ -39,7 +39,8 @@ struct CPU {
 		INSTRUCTION_AR =  0x0A,     //  3 cycles 
 		INSTRUCTION_SRI = 0x0B,     //  3 cycles
 		INSTRUCTION_SR  = 0x0C,      //  3 cycles  
-		INSTRUCTION_FD =  0x0D       //  2 cycles
+		INSTRUCTION_FD =  0x0D,       // 2 cycles
+		INSTRUCTION_KAC = 0x0E        // 2 cycles ??
 	};
 
 	//opcodes registri

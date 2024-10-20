@@ -171,6 +171,15 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 			Byte Constante = Fetch(NumCycles, memorie);  
 			WR = Constante;
 		}
+		case INSTRUCTION_KAC:
+		{
+			Byte NumeroPointer = Fetch(NumCycles, memorie);	 // aici o sa se implementeze logica cu cei 2 pointeri
+			if(NumeroPointer == 1) {
+				scanf("%d", &WR);
+			} else {
+				printf("De implementat scrierea in memoria pointata de catre pointer 2.\n");
+			}
+		} break;
 
 		default: printf("Instruction %d not handled.", Instruction);
 		}
