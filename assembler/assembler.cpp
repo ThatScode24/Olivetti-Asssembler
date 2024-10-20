@@ -10,6 +10,9 @@ Probleme:
 
 -> de fiecare data cand e 0xA in toWrite, asta adauga un 0xD inainte                                                         OK
 era problema cu modul de deschidere a fisierului, il deschideam si la inceput si la append in text mode 
+-> Daca eu o linie de comment, ea este eliminata in vectorul care omite comentariile, dar
+linia de eroare (daca apare una) este eronata. 
+-> Daca e o linie invalida / doar un spatiu => assertion failure!
 
 
 Nume: Olivetti A5BAL8/P101-C6502
@@ -49,6 +52,8 @@ int main(void) {
 		std::string linie_curata = manip::removeComments(linie);
 		if(!linie_curata.empty()) fara_com.push_back(linie_curata);
 	}
+
+	bool numberMode = 0;
 	    
 	for(std::string& line : fara_com) {
 		if(line.empty()) continue;
@@ -75,24 +80,42 @@ int main(void) {
 		if( mnemonic == "LI" || mnemonic == "li" ) {
 			if( manip::validate_expression(token[1], '%') && manip::validate_expression(token[2], '$') ) {
 				int Register = manip::validate_register( manip::remove_occurences(token[1], '%') );		
-				int Constant;
 				if(Register == 0x10 || Register == 0x12) printf("Line %d: Cannot load integer into this register.\n", current_line);
 				else if(Register != -1) {   // sa existe si sa nu fie WR si CR
-					try {
-						Constant = std::stoi( manip::remove_occurences(token[2], '$') );
-						if( manip::validate_constant(Constant) ) {
-							toWrite.push_back(0x00);    // opcode instructiune LI 
-							toWrite.push_back(Register);
-							toWrite.push_back(Constant);
+					if( numberMode == 1) {
+						if(manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", current_line);
+						else {
+							try {
+								int Constant = std::stoi( manip::remove_occurences(token[2], '$') );
+								if( manip::validate_constant(Constant) ) {
+									toWrite.push_back(0x00);    // opcode instructiune LI 
+									toWrite.push_back(Register);
+									toWrite.push_back(Constant);
 
-							manip::write_binary(toWrite);
+									manip::write_binary(toWrite);
 
-							manip::printVector(toWrite);
+									manip::printVector(toWrite);
 
-							//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
-						} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
-					} catch( const std::invalid_argument& arg ) {
-						printf("Line %d: Expected an integer.\n", current_line);   // daca ajungem aici, nu era o constanta
+									//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
+								} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
+							} catch( const std::invalid_argument& arg ) {
+								printf("Line %d: Expected an integer.\n", current_line);   // daca ajungem aici, nu era o constanta
+							}
+						}
+					} else {   // handle hexa mode
+						if(!manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", current_line);
+						else {
+							int numBaseTen = std::stoi(manip::remove_occurences(token[2], '$'), nullptr, 16);
+							if( manip::validate_constant(numBaseTen) ) {
+
+								toWrite.push_back(0x00);    // opcode instructiune LI 
+								toWrite.push_back(Register);
+								toWrite.push_back(numBaseTen);
+
+								manip::write_binary(toWrite);
+								manip::printVector(toWrite);
+							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
+						}
 					}
 				} else printf("Line %d: Register does not exist.\n", current_line);
 			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);   
@@ -316,7 +339,18 @@ int main(void) {
 			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
 		}
 
-		
+		else if( mnemonic == "KAC" || mnemonic == "kac") {
+			if( manip::validate_expression(token[1], '&') ) {
+				int system_pointer = std::stoi( manip::remove_occurences(token[1], '&') );
+				if(system_pointer == 0x1 || system_pointer == 0x2) {
+					toWrite.push_back(0x0E);
+					toWrite.push_back(system_pointer);
+					manip::write_binary(toWrite);
+					manip::printVector(toWrite);
+				} else printf("Line %d: Wrong System Pointer Number.\n", current_line);
+			} else printf("Line %d: Wrong/Missing prefix for System Pointer.\n", current_line);
+		}
+
 		else if( mnemonic == "FD" || mnemonic == "fd" ) {
 			if( manip::validate_expression(token[1], '$')) {
 				int Constante = std::stoi( manip::remove_occurences(token[1], '$' ) );
@@ -329,6 +363,16 @@ int main(void) {
 					manip::printVector(toWrite);
 				} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
 			} else printf("Line %d: Incorrect/Missing prefix for constant.\n", current_line);
+		}
+
+		else if( mnemonic == "DE1" || mnemonic == "de1" ) {
+			numberMode = 0;
+			printf("Number mode set to hexadecimal.\n");
+		}
+
+		else if( mnemonic == "DE2" || mnemonic == "de2" ) {
+			numberMode = 1;
+			printf("Number mode set to base 10.\n");
 		}
 
 		current_line++;

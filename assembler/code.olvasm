@@ -1,9 +1,11 @@
-LI %10, $5    
-LI %15, $10
-AR %10, %15
-LR %15, %10
-LRZ ~15
-FD $255  
-LCR %M, %RA
 
 
+; LI %10, $5     ; incarcam 5 in reg 10
+; LI %15, $10    ; *       10 *      15
+; AR %10, %15    ; add reg 15 si 10
+; LR %15, %10    ; mov 10 in 15
+; LRZ ~15        ; resetam toti registri
+; FD $255        ; LI 255, WR
+; LCR %M, %RA    ; xchg M, RA
+
+LI %10, $0x42

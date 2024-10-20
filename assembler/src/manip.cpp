@@ -62,3 +62,5 @@ void manip::printVector(const std::vector<std::uint8_t> &vec) {
 	}
 	printf("\n");
 }
+
+bool manip::containsHexPrefix(const std::string& potential) { return (potential.find("0x") != std::string::npos || potential.find("0X") != std::string::npos); }

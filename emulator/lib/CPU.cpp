@@ -175,7 +175,9 @@ void CPU::Exec(unsigned int NumCycles, Memory& memorie)
 		{
 			Byte NumeroPointer = Fetch(NumCycles, memorie);	 // aici o sa se implementeze logica cu cei 2 pointeri
 			if(NumeroPointer == 1) {
-				scanf("%d", &WR);
+				char alfanumerico;
+				scanf("%c", &alfanumerico);
+				WR = alfanumerico;
 			} else {
 				printf("De implementat scrierea in memoria pointata de catre pointer 2.\n");
 			}

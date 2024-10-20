@@ -44,6 +44,10 @@ The project introduces a unique assembly syntax that mirrors the minimalist styl
 - **Register Count**: When using special instructions like `LRZ` or `LZ`, which reset registers, the `~` symbol is used to indicate the number of target registers.
   - Example: `~3` refers to reseting 3 registers
 
+- **System Pointer**: When using the machine's numerical/alphanumerical input instructions (`KAC`, `K`...), the `&` prefix needs to be 
+added 
+  - Example: `KAC &1` will write to the location pointed by Pointer 1 (WR).  
+  
 ### Example Code:
 
 ```assembly

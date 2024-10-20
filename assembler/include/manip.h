@@ -20,6 +20,7 @@ namespace manip {
     std::string toUpperCase(std::string str);
     std::string removeComments(const std::string& linie);
     void printVector(const std::vector<std::uint8_t> &vec);
+    bool containsHexPrefix(const std::string& potential);
 }
 
 #endif
