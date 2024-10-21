@@ -55,6 +55,18 @@ LI %09, $10    ; Load the constant 10 into register 9
 LAX %15        ; Move the content of register 15 in the Auxillary Register (RA)
 LRZ ~5         ; Resets 5 registers
 ```
+## Number Modes:
+
+These modes are for the Constant format.
+
+**Hexadecimal Mode (Default)**
+
+`DE1` to switch to Hexadecimal mode.
+
+```assembly 
+DE1 
+LI, $0x42
+```
 
 
 ## Instructions
