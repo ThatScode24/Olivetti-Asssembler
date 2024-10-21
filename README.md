@@ -65,9 +65,17 @@ These modes are for the Constant format.
 
 ```assembly 
 DE1 
-LI, $0x42
+LI %03, $0x42
 ```
 
+**Decimal Mode**
+
+`DE2` to switch to Decimal mode
+
+```assembly 
+DE2
+LI %04, $66
+```
 
 ## Instructions
 
