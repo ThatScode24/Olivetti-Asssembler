@@ -51,16 +51,22 @@ int manip::validate_register( const std::string &Register) {
 }
 
 std::string manip::removeComments(const std::string& linie) {
-	size_t pozitie = linie.find(';');
-	return (pozitie != std::string::npos) ? linie.substr(0, pozitie) : linie;
+	std::string trim = manip::flameSpaces(linie);
+	size_t pozitie = trim.find(';');
+	return (pozitie != std::string::npos) ? trim.substr(0, pozitie) : trim;
 }
 
 
 void manip::printVector(const std::vector<std::uint8_t> &vec) {
-	for(const std::uint8_t &num : vec) {
-		printf("%d ", num);
-	}
+	for(const std::uint8_t &num : vec) printf("%d ", num);
 	printf("\n");
 }
 
 bool manip::containsHexPrefix(const std::string& potential) { return (potential.find("0x") != std::string::npos || potential.find("0X") != std::string::npos); }
+
+std::string manip::flameSpaces(const std::string& start) {
+	size_t st = start.find_first_not_of(' ');
+	if ( st == std::string::npos) return "";
+	std::string::size_type end = start.find_last_not_of(' ');
+    return start.substr(st, end - st + 1);
+}

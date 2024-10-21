@@ -21,6 +21,7 @@ namespace manip {
     std::string removeComments(const std::string& linie);
     void printVector(const std::vector<std::uint8_t> &vec);
     bool containsHexPrefix(const std::string& potential);
+    std::string flameSpaces(const std::string& start);
 }
 
 #endif

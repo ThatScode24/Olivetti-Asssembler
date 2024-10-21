@@ -6,11 +6,11 @@
 -> should implement all of the condition checking directly in the assembler                                                  OK
 -> should include details about instructions in readme               
 
-Probleme:
+Probleme
 
 -> de fiecare data cand e 0xA in toWrite, asta adauga un 0xD inainte                                                         OK
-era problema cu modul de deschidere a fisierului, il deschideam si la inceput si la append in text mode 
--> Daca eu o linie de comment, ea este eliminata in vectorul care omite comentariile, dar
+era problema cu modul de deschidere a fisierului, il deschideam si la inceput si la append in text mode 					 OK
+-> Daca eu o linie de comment, ea este eliminata in vectorul care omite comentariile, dar                                    
 linia de eroare (daca apare una) este eronata. 
 -> Daca e o linie invalida / doar un spatiu => assertion failure!
 
@@ -35,7 +35,7 @@ cmake --build .
 #include <algorithm>
 #include <stdio.h>
 #include "manip.h"
-
+#include <utility>
 
 int main(void) {
 	std::ifstream file("code.olvasm");
@@ -43,26 +43,27 @@ int main(void) {
 	std::string linie;          //   linie de cod 
 	std::string word;                    //     buffer pentru fiecare element din token 
 
-	std::vector<std::string> fara_com = {};
+	std::vector<std::pair<std::string, int>> fara_com = {};
 
-	short current_line = 1;     // numarul liniei de cod
+	int current_line = 1;     // numarul liniei de cod
 	manip::init_binary();        //   cream o fila noua output.bin
 
 	while(std::getline(file, linie)) {
 		std::string linie_curata = manip::removeComments(linie);
-		if(!linie_curata.empty()) fara_com.push_back(linie_curata);
+		if(!linie_curata.empty()) fara_com.emplace_back(linie_curata, current_line);
+		current_line++;
 	}
 
 	bool numberMode = 0;
 	    
-	for(std::string& line : fara_com) {
-		if(line.empty()) continue;
+	for( std::pair<std::string,int>& line : fara_com ){
+		if(line.first.empty()) continue;
 		//         scoatem toate \n si \r care or exista
 		
-		line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
-		line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+		line.first.erase(std::remove(line.first.begin(), line.first.end(), '\n'), line.first.end());
+		line.first.erase(std::remove(line.first.begin(), line.first.end(), '\r'), line.first.end());
 			
-		std::string line_without_comma = std::regex_replace(line, comma, "");   //     scoatem virgula eventuala
+		std::string line_without_comma = std::regex_replace(line.first, comma, "");   //     scoatem virgula eventuala
 		
 		//       cu asta separam instructiunea intr-un vector 	
 		std::istringstream iss(line_without_comma);
@@ -80,10 +81,10 @@ int main(void) {
 		if( mnemonic == "LI" || mnemonic == "li" ) {
 			if( manip::validate_expression(token[1], '%') && manip::validate_expression(token[2], '$') ) {
 				int Register = manip::validate_register( manip::remove_occurences(token[1], '%') );		
-				if(Register == 0x10 || Register == 0x12) printf("Line %d: Cannot load integer into this register.\n", current_line);
+				if(Register == 0x10 || Register == 0x12) printf("Line %d: Cannot load integer into this register.\n", line.second);
 				else if(Register != -1) {   // sa existe si sa nu fie WR si CR
 					if( numberMode == 1) {
-						if(manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", current_line);
+						if(manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
 						else {
 							try {
 								int Constant = std::stoi( manip::remove_occurences(token[2], '$') );
@@ -97,13 +98,13 @@ int main(void) {
 									manip::printVector(toWrite);
 
 									//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
-								} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
+								} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
 							} catch( const std::invalid_argument& arg ) {
-								printf("Line %d: Expected an integer.\n", current_line);   // daca ajungem aici, nu era o constanta
+								printf("Line %d: Expected an integer.\n", line.second);   // daca ajungem aici, nu era o constanta
 							}
 						}
 					} else {   // handle hexa mode
-						if(!manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", current_line);
+						if(!manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
 						else {
 							int numBaseTen = std::stoi(manip::remove_occurences(token[2], '$'), nullptr, 16);
 							if( manip::validate_constant(numBaseTen) ) {
@@ -114,11 +115,11 @@ int main(void) {
 
 								manip::write_binary(toWrite);
 								manip::printVector(toWrite);
-							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
+							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
 						}
 					}
-				} else printf("Line %d: Register does not exist.\n", current_line);
-			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);   
+				} else printf("Line %d: Register does not exist.\n", line.second);
+			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", line.second);   
 		
 		} else if( mnemonic == "PR" || mnemonic == "pr" ) {
 			if ( manip::validate_expression(token[1], '%' ) ) {
@@ -129,8 +130,8 @@ int main(void) {
 
 					manip::write_binary(toWrite);
 					manip::printVector(toWrite);
-				} else printf("Line %d: Invalid Register.\n", current_line);
-			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
+				} else printf("Line %d: Invalid Register.\n", line.second);
+			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", line.second);
 		
 		} else if( mnemonic == "LAX" || mnemonic == "lax") {
 			if( manip::validate_expression(token[1], '%') ) {
@@ -141,8 +142,8 @@ int main(void) {
 
 					manip::write_binary(toWrite);
 					manip::printVector(toWrite);
-				} else printf("Line %d: Cannot execute LAX instruction on this register.\n", current_line);
-			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
+				} else printf("Line %d: Cannot execute LAX instruction on this register.\n", line.second);
+			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", line.second);
 		
 		} else if ( mnemonic == "SAX" || mnemonic == "sax" ) {
 			if( manip::validate_expression(token[1], '%') ) {
@@ -153,15 +154,15 @@ int main(void) {
 
 					manip::write_binary(toWrite);
 					manip::printVector(toWrite);
-				} else printf("Line %d: Cannot execute SAX instruction on this register.\n", current_line);
-			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
+				} else printf("Line %d: Cannot execute SAX instruction on this register.\n", line.second);
+			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", line.second);
 		}
 
 		else if ( mnemonic == "LRZ" || mnemonic == "lrz" ) {
 			if ( manip::validate_expression(token[1], '~') ) {
 				int Register_Count = std::stoi(manip::remove_occurences(token[1], '~'));
 				
-				if ( Register_Count <1 || Register_Count > 0x14) printf("Line %d: Invalid Register Count Logic.\n", current_line);
+				if ( Register_Count <1 || Register_Count > 0x14) printf("Line %d: Invalid Register Count Logic.\n", line.second);
 				else {
 					toWrite.push_back(0x07);
 					toWrite.push_back(Register_Count);
@@ -170,7 +171,7 @@ int main(void) {
 
 					manip::printVector(toWrite);
 				}
-			} else printf("Line %d: Wrong/Missing prefix for Register Count.\n", current_line);
+			} else printf("Line %d: Wrong/Missing prefix for Register Count.\n", line.second);
 		}
 		
 		else if ( mnemonic == "ARI" || mnemonic == "ari" ) {
@@ -178,7 +179,7 @@ int main(void) {
 				int Register = manip::validate_register(manip::remove_occurences(token[1], '%'));
 				int Constant; 
 				if(Register != -1) {
-					if(Register == 0x12 || Register == 0x10) printf("Line %d: Cannot execute ARI on this register.\n", current_line);
+					if(Register == 0x12 || Register == 0x10) printf("Line %d: Cannot execute ARI on this register.\n", line.second);
 					else {
 						try {
 							Constant = std::stoi( manip::remove_occurences(token[2], '$') );
@@ -191,14 +192,14 @@ int main(void) {
 								manip::printVector(toWrite);
 
 								//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
-							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
+							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
 						} catch( const std::invalid_argument& arg ) {
-							printf("Line %d: Expected an integer.\n", current_line);   // daca ajungem aici, nu era o constanta
+							printf("Line %d: Expected an integer.\n", line.second);   // daca ajungem aici, nu era o constanta
 						}
 					}
-				} else printf("Line %d: Register does not exist.\n", current_line);
+				} else printf("Line %d: Register does not exist.\n", line.second);
 
-			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
+			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", line.second);
 		}
 
 		else if ( mnemonic == "LZ" || mnemonic == "lz") {
@@ -207,7 +208,7 @@ int main(void) {
 				if(Register != -1 || Register == 0x10 || Register == 0x12) {
 					try {
 						int Next = ( std::stoi( manip::remove_occurences(token[2], '~') ) ) > 15 ? -1 : std::stoi( manip::remove_occurences(token[2], '~') );
-						if(Next == -1) printf("Line %d: Too many target registers.\n", current_line);
+						if(Next == -1) printf("Line %d: Too many target registers.\n", line.second);
 						else {
 							toWrite.push_back(0x08);
 							toWrite.push_back(Register);
@@ -217,11 +218,11 @@ int main(void) {
 							manip::printVector(toWrite);
 						}
 					} catch(const std::invalid_argument& arg) {
-						printf("Line %d: Expected an integer.\n", current_line);
+						printf("Line %d: Expected an integer.\n", line.second);
 					}
-				} else printf("Line %d: Register does not exit/cannot execute LZ on this Register.\n", current_line);
+				} else printf("Line %d: Register does not exit/cannot execute LZ on this Register.\n", line.second);
 			
-			} else printf("Line %d: Wrong/Missing prefix for Register Count/Register.\n", current_line);
+			} else printf("Line %d: Wrong/Missing prefix for Register Count/Register.\n", line.second);
 		}
 
 		else if( mnemonic == "SR" || mnemonic == "sr") {
@@ -229,7 +230,7 @@ int main(void) {
 				int Register1 = manip::validate_register( manip::remove_occurences(token[1], '%'));
 				int Register2 = manip::validate_register( manip::remove_occurences(token[2], '%'));
 
-				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", current_line);
+				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", line.second);
 				else {
 					if ((Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) ||
 					((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
@@ -240,9 +241,9 @@ int main(void) {
 
 						manip::write_binary(toWrite);
 						manip::printVector(toWrite);
-					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
+					} else printf("Line %d: Incorrect combination of registers.\n", line.second);
 				}
-			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
+			} else printf("Line %d: Wrong/Missing prefix for Register.\n", line.second);
 		}
 
 		else if( mnemonic == "AR" || mnemonic == "ar") {
@@ -250,7 +251,7 @@ int main(void) {
 				int Register1 = manip::validate_register( manip::remove_occurences(token[1], '%'));
 				int Register2 = manip::validate_register( manip::remove_occurences(token[2], '%'));
 
-				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", current_line);
+				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", line.second);
 				else {
 					if ((Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) ||
 					((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
@@ -263,9 +264,9 @@ int main(void) {
 
 
 						manip::printVector(toWrite);
-					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
+					} else printf("Line %d: Incorrect combination of registers.\n", line.second);
 				}
-			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
+			} else printf("Line %d: Wrong/Missing prefix for Register.\n", line.second);
 		}
 
 		else if( mnemonic == "LR" || mnemonic == "lr") {
@@ -273,7 +274,7 @@ int main(void) {
 				int Register1 = manip::validate_register( manip::remove_occurences(token[1], '%'));
 				int Register2 = manip::validate_register( manip::remove_occurences(token[2], '%'));
 
-				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", current_line);
+				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", line.second);
 				else {
 					if ( (Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) || 
 					((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
@@ -285,9 +286,9 @@ int main(void) {
 						manip::write_binary(toWrite);
 
 						manip::printVector(toWrite);
-					} else printf("Line %d: Incorrect combination of registers.\n", current_line);
+					} else printf("Line %d: Incorrect combination of registers.\n", line.second);
 				}
-			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
+			} else printf("Line %d: Wrong/Missing prefix for Register.\n", line.second);
 		}
 
 		else if ( mnemonic == "SRI" || mnemonic == "sri" ) {
@@ -295,7 +296,7 @@ int main(void) {
 				int Register = manip::validate_register(manip::remove_occurences(token[1], '%'));
 				int Constant; 
 				if(Register != -1) {
-					if(Register == 0x12 || Register == 0x10) printf("Line %d: Cannot execute ARI on this register.\n", current_line);
+					if(Register == 0x12 || Register == 0x10) printf("Line %d: Cannot execute ARI on this register.\n", line.second);
 					else {
 						try {
 							Constant = std::stoi( manip::remove_occurences(token[2], '$') );
@@ -307,14 +308,14 @@ int main(void) {
 								manip::write_binary(toWrite);
 								manip::printVector(toWrite);
 								//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
-							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
+							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
 						} catch( const std::invalid_argument& arg ) {
-							printf("Line %d: Expected an integer.\n", current_line);   // daca ajungem aici, nu era o constanta
+							printf("Line %d: Expected an integer.\n", line.second);   // daca ajungem aici, nu era o constanta
 						}
 					}
-				} else printf("Line %d: Register does not exist.\n", current_line);
+				} else printf("Line %d: Register does not exist.\n", line.second);
 
-			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", current_line);
+			} else printf("Line %d: Wrong/Missing prefix for Register/Constant.\n", line.second);
 		}
 
 		else if( mnemonic == "LCR" || mnemonic == "lcr" ) {
@@ -322,7 +323,7 @@ int main(void) {
 				int Register1 = manip::validate_register(manip::remove_occurences(token[1], '%'));
 				int Register2 = manip::validate_register(manip::remove_occurences(token[2], '%'));
 
-				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", current_line);
+				if(Register1 == -1 || Register2 == -1) printf("Line %d: Register not found.\n", line.second);
 				else {
 					if ((Register1 >= 0 && Register1 <= 15 && Register2 >= 0 && Register2 <= 15) ||
 					((Register1 == 0x11 || Register1 == 0x15 || Register1 == 0x14 || Register1 == 0x13) &&
@@ -334,9 +335,9 @@ int main(void) {
 						manip::write_binary(toWrite);
 						manip::printVector(toWrite);
 
-					} else printf("Line %d: Wrong Register logic.\n", current_line);
+					} else printf("Line %d: Wrong Register logic.\n", line.second);
 				}
-			} else printf("Line %d: Wrong/Missing prefix for Register.\n", current_line);
+			} else printf("Line %d: Wrong/Missing prefix for Register.\n", line.second);
 		}
 
 		else if( mnemonic == "KAC" || mnemonic == "kac") {
@@ -347,8 +348,8 @@ int main(void) {
 					toWrite.push_back(system_pointer);
 					manip::write_binary(toWrite);
 					manip::printVector(toWrite);
-				} else printf("Line %d: Wrong System Pointer Number.\n", current_line);
-			} else printf("Line %d: Wrong/Missing prefix for System Pointer.\n", current_line);
+				} else printf("Line %d: Wrong System Pointer Number.\n", line.second);
+			} else printf("Line %d: Wrong/Missing prefix for System Pointer.\n", line.second);
 		}
 
 		else if( mnemonic == "FD" || mnemonic == "fd" ) {
@@ -361,8 +362,8 @@ int main(void) {
 
 					manip::write_binary(toWrite);
 					manip::printVector(toWrite);
-				} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", current_line);
-			} else printf("Line %d: Incorrect/Missing prefix for constant.\n", current_line);
+				} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
+			} else printf("Line %d: Incorrect/Missing prefix for constant.\n", line.second);
 		}
 
 		else if( mnemonic == "DE1" || mnemonic == "de1" ) {
@@ -373,9 +374,9 @@ int main(void) {
 		else if( mnemonic == "DE2" || mnemonic == "de2" ) {
 			numberMode = 1;
 			printf("Number mode set to base 10.\n");
+		} else {
+			std::cout<< "Line " << line.second << ": <" << line.first << "> Syntax Error." << std::endl;
 		}
-
-		current_line++;
 	}
 	return 0;
 }
