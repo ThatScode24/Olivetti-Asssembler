@@ -1,9 +1,8 @@
-DE1    ;      anastaproasta
-TCP 
+DE1     ; lucram in mod exadecimal
 
-LI %10, $0x42
+FD $0x4
+LI %04, $0x0A
 
-DE2
- 
-LI %10, $66      
-               
+
+
+

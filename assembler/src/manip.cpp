@@ -28,7 +28,7 @@ bool manip::validate_constant( int Constant ) {
 }
 
 int manip::find_index(const std::string &elem, const std::vector<std::string>& vec) {
-	auto it = std::find(vec.begin(), vec.end(), elem);
+	std::vector<std::string>::const_iterator it = std::find(vec.begin(), vec.end(), elem);
 	return (it != vec.end()) ? std::distance(vec.begin(), it) + 0x10 : -1;
 }
 

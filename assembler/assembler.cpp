@@ -13,10 +13,13 @@ era problema cu modul de deschidere a fisierului, il deschideam si la inceput si
 -> Daca eu o linie de comment, ea este eliminata in vectorul care omite comentariile, dar                                    
 linia de eroare (daca apare una) este eronata. 
 -> Daca e o linie invalida / doar un spatiu => assertion failure!
-
+-> std::invalid_argument daca sunt in mod exadecimal si e o problema cu sintaxa constantei (si are 0x in ea).                OK
 
 Nume: Olivetti A5BAL8/P101-C6502
 
+De schimbat:
+
+->culoarea de la DE1 si DE2 sa fie mov, adica sa nu se califice ca o instructiune.                                           OK
 
 Asamblarea se face in 2 etape:                                                                                               OK
 
@@ -83,7 +86,7 @@ int main(void) {
 				int Register = manip::validate_register( manip::remove_occurences(token[1], '%') );		
 				if(Register == 0x10 || Register == 0x12) printf("Line %d: Cannot load integer into this register.\n", line.second);
 				else if(Register != -1) {   // sa existe si sa nu fie WR si CR
-					if( numberMode == 1) {
+					if( numberMode ) {
 						if(manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
 						else {
 							try {
@@ -106,16 +109,19 @@ int main(void) {
 					} else {   // handle hexa mode
 						if(!manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
 						else {
-							int numBaseTen = std::stoi(manip::remove_occurences(token[2], '$'), nullptr, 16);
-							if( manip::validate_constant(numBaseTen) ) {
-
-								toWrite.push_back(0x00);    // opcode instructiune LI 
-								toWrite.push_back(Register);
-								toWrite.push_back(numBaseTen);
-
-								manip::write_binary(toWrite);
-								manip::printVector(toWrite);
-							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
+							try{
+								int numBaseTen = std::stoi(manip::remove_occurences(token[2], '$'), nullptr, 16);
+								if( manip::validate_constant(numBaseTen) ) {
+									toWrite.push_back(0x00);    // opcode instructiune LI 
+									toWrite.push_back(Register);
+									toWrite.push_back(numBaseTen);
+									
+									manip::write_binary(toWrite);
+									manip::printVector(toWrite);
+								} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
+							} catch( const std::invalid_argument &arg ) {
+								printf("Line %d: Expected an integer.\n", line.second);
+							}
 						}
 					}
 				} else printf("Line %d: Register does not exist.\n", line.second);
@@ -181,20 +187,43 @@ int main(void) {
 				if(Register != -1) {
 					if(Register == 0x12 || Register == 0x10) printf("Line %d: Cannot execute ARI on this register.\n", line.second);
 					else {
-						try {
-							Constant = std::stoi( manip::remove_occurences(token[2], '$') );
-							if( manip::validate_constant(Constant) ) {
-								toWrite.push_back(0x09);    // opcode instructiune ARI
-								toWrite.push_back(Register);
-								toWrite.push_back(Constant);
+						if(numberMode) {
+							if(manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
+							else {
+								try {
+									Constant = std::stoi( manip::remove_occurences(token[2], '$') );
+									if( manip::validate_constant(Constant) ) {
+										toWrite.push_back(0x09);    // opcode instructiune ARI
+										toWrite.push_back(Register);
+										toWrite.push_back(Constant);
 
-								manip::write_binary(toWrite);
-								manip::printVector(toWrite);
+										manip::write_binary(toWrite);
+										manip::printVector(toWrite);
 
-								//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
-							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
-						} catch( const std::invalid_argument& arg ) {
-							printf("Line %d: Expected an integer.\n", line.second);   // daca ajungem aici, nu era o constanta
+										//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
+									} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
+								} catch( const std::invalid_argument& arg ) {
+									printf("Line %d: Expected an integer.\n", line.second);   // daca ajungem aici, nu era o constanta
+								}
+							}
+						} else {
+							if(!manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
+							else {
+								try {
+									int numBaseTen = std::stoi(manip::remove_occurences(token[2], '$'), nullptr, 16);
+									if( manip::validate_constant(numBaseTen) ) {
+
+										toWrite.push_back(0x09);    // opcode instructiune ARI
+										toWrite.push_back(Register);
+										toWrite.push_back(numBaseTen);
+
+										manip::write_binary(toWrite);
+										manip::printVector(toWrite);
+									} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
+								} catch( const std::invalid_argument& arg ) {
+									printf("Line %d: Expected an integer.\n", line.second);
+								}
+							}
 						}
 					}
 				} else printf("Line %d: Register does not exist.\n", line.second);
@@ -238,7 +267,6 @@ int main(void) {
 						toWrite.push_back(0xC);
 						toWrite.push_back(Register1);
 						toWrite.push_back(Register2);
-
 						manip::write_binary(toWrite);
 						manip::printVector(toWrite);
 					} else printf("Line %d: Incorrect combination of registers.\n", line.second);
@@ -259,10 +287,7 @@ int main(void) {
 						toWrite.push_back(0xA);
 						toWrite.push_back(Register1);
 						toWrite.push_back(Register2);
-
 						manip::write_binary(toWrite);
-
-
 						manip::printVector(toWrite);
 					} else printf("Line %d: Incorrect combination of registers.\n", line.second);
 				}
@@ -298,19 +323,42 @@ int main(void) {
 				if(Register != -1) {
 					if(Register == 0x12 || Register == 0x10) printf("Line %d: Cannot execute ARI on this register.\n", line.second);
 					else {
-						try {
-							Constant = std::stoi( manip::remove_occurences(token[2], '$') );
-							if( manip::validate_constant(Constant) ) {
-								toWrite.push_back(0x0B);    // opcode instructiune SRI
-								toWrite.push_back(Register);
-								toWrite.push_back(Constant);
+						if( numberMode) {
+							if(manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
+							else {
+								try {
+									Constant = std::stoi( manip::remove_occurences(token[2], '$') );
+									if( manip::validate_constant(Constant) ) {
+										toWrite.push_back(0x0B);    // opcode instructiune SRI
+										toWrite.push_back(Register);
+										toWrite.push_back(Constant);
 
-								manip::write_binary(toWrite);
-								manip::printVector(toWrite);
-								//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
-							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
-						} catch( const std::invalid_argument& arg ) {
-							printf("Line %d: Expected an integer.\n", line.second);   // daca ajungem aici, nu era o constanta
+										manip::write_binary(toWrite);
+										manip::printVector(toWrite);
+										//      printf("%d %d %d", toWrite[0], toWrite[1], toWrite[2]);
+									} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
+								} catch( const std::invalid_argument& arg ) {
+									printf("Line %d: Expected an integer.\n", line.second);   // daca ajungem aici, nu era o constanta
+								}
+							}
+						} else {
+							if(!manip::containsHexPrefix(token[2])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
+							else {
+								try{
+									int numBaseTen = std::stoi(manip::remove_occurences(token[2], '$'), nullptr, 16);
+									if( manip::validate_constant(numBaseTen) ) {
+
+										toWrite.push_back(0x0B);    // opcode instructiune ARI
+										toWrite.push_back(Register);
+										toWrite.push_back(numBaseTen);
+
+										manip::write_binary(toWrite);
+										manip::printVector(toWrite);
+									} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
+								} catch( const std::invalid_argument& arg) {
+									printf("Line %d: Expected an integer.\n", line.second);
+								}
+							}
 						}
 					}
 				} else printf("Line %d: Register does not exist.\n", line.second);
@@ -354,15 +402,40 @@ int main(void) {
 
 		else if( mnemonic == "FD" || mnemonic == "fd" ) {
 			if( manip::validate_expression(token[1], '$')) {
-				int Constante = std::stoi( manip::remove_occurences(token[1], '$' ) );
+				if( numberMode ) {
+					if(manip::containsHexPrefix(token[1])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
+					else {
+						try{
+							int Constante = std::stoi( manip::remove_occurences(token[1], '$' ) );
+							if( manip::validate_constant(Constante) ) {
+								toWrite.push_back(0x0D);
+								toWrite.push_back(Constante);
 
-				if( manip::validate_constant(Constante) ) {
-					toWrite.push_back(0x0D);
-					toWrite.push_back(Constante);
+								manip::write_binary(toWrite);
+								manip::printVector(toWrite);
+							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
+						} catch( const std::invalid_argument &arg ) {
+							printf("Line %d: Expected an integer.\n", line.second); 
+						}
+					}
+				} else {
+					if(!manip::containsHexPrefix(token[1])) printf("Line %d: Invalid constant format for this number mode.\n", line.second);
+					else {
+						try {
+							int numBaseTen = std::stoi(manip::remove_occurences(token[1], '$'), nullptr, 16);
+							if( manip::validate_constant(numBaseTen) ) {
 
-					manip::write_binary(toWrite);
-					manip::printVector(toWrite);
-				} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);
+								toWrite.push_back(0x0D);    // opcode instructiune FD
+								toWrite.push_back(numBaseTen);
+
+								manip::write_binary(toWrite);
+								manip::printVector(toWrite);
+							} else printf("Line %d: Unsigned integer exceeds 8 bits.\n", line.second);	
+						} catch( const std::invalid_argument& arg) {
+							printf("Line %d: Expected an integer.\n", line.second);
+						}
+					}			
+				}
 			} else printf("Line %d: Incorrect/Missing prefix for constant.\n", line.second);
 		}
 
