@@ -4,6 +4,7 @@
 # Ignore build directories
 build/
 build*/
+resources/
 
 # Ignore CMake-generated files
 CMakeFiles/

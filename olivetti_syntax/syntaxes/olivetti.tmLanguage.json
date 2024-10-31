@@ -5,7 +5,11 @@
     "patterns": [
         {
             "name": "keyword.instruction.olvasm",
-            "match": "(LI|PR|AR|LRZ|ARI|SR|SRI|RMC|LAX|SAX|LCR|LZ|LR|FD|KAC|DE1|DE2|li|pr|ar|lrz|ari|sr|sri|rmc|lax|sax|lcr|lz|lr|fd|kac|de1|de2)"
+            "match": "(LI|PR|ARI|LRZ|AR|SRI|SR|RMC|LAX|SAX|LCR|LZ|LR|FD|KAC|li|pr|ari|lrz|ar|sri|sr|rmc|lax|sax|lcr|lz|lr|fd|kac)"
+        },
+        {
+            "name": "keyword.numbermode.olvasm",
+            "match": "(DE1|DE2|de1|de2|KEP|KES|kep|kes|CSECT|csect)"
         },
         {
             "name": "variable.parameter.register.olvasm",

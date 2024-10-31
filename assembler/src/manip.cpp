@@ -58,7 +58,7 @@ std::string manip::removeComments(const std::string& linie) {
 
 
 void manip::printVector(const std::vector<std::uint8_t> &vec) {
-	for(const std::uint8_t &num : vec) printf("%d ", num);
+	for(const std::uint8_t &num : vec) printf("     0x%X     ", num);        //       format exadecimal
 	printf("\n");
 }
 

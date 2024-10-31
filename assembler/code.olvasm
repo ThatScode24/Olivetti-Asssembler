@@ -1,8 +1,51 @@
-DE1     ; lucram in mod exadecimal
+;   reparat regex pentru VSCODE (sa accepte $00).                      OK
+;   syntax highlighting VIM + vscode                                   OK
+;   ====================================================
+;   comanda ON pentru aprindere led si comanda OFF                     OK
+;   pentru stingere ( 00 e led de eroare si 1 pana 8                   OK
+;   e led 1 pana 8                                                     OK
+;   ====================================================
+;   inlocuit DE1 si DE2 cu FFO1 si FFO2   (front feed output 1 & 2)    OK
+;   inlocuit START cu STIO (Start Input Output)                        OK
+;   WR nu e Write Register ci Work Register
+;   ====================================================
+;   in practica va trebui sa porneasca pe KEYB mode si sa dam
+;   switch manual dar e prea zeit costisitor  
 
-FD $0x4
-LI %04, $0x0A
+TITLE          'LED-TEST'       ; structura de Basic Assembly Language 
+                              
+STIO                            ;      inceputul codului         (START INPUT OUTPUT),     Audit 7
+FFO1                            ;      Lucram in mod exadecimal. (FRONT FEED OUTPUT 1),    Audit 7
+KEP                             ;      fereastra olivetti                                  Audit 5
 
+LI %RA, $0x6F
+PR %RA
+LI %RA, $0x75
+PR %RA
+LI %RA, $0x74
+PR %RA
+LI %RA, $0x70
+PR %RA
+LI %RA, $0x75
+PR %RA
+LI %RA, $0x74
+PR %RA
+LI %RA, $0x20
+PR %RA
+LI %RA, $0x74
+PR %RA
+LI %RA, $0x65
+PR %RA
+LI %RA, $0x73
+PR %RA
+LI %RA, $0x74
+PR %RA
 
+ON $00
+ON $08
+ON $01
+ON $05
 
+HLT 
+END
 

@@ -2,17 +2,17 @@
 
 -> De adaugat suport pentru registri alfanumerici (dar si compatibilitati) exact cum e in Emulator.cpp in VS.                OK
 -> De adaugat suport pentru registri scris in litere mici (de ex, merge cu RA dar nu cu ra)                                  OK
--> should try to minimise try catch blocks 
--> should implement all of the condition checking directly in the assembler                                                  OK
--> should include details about instructions in readme               
+-> SHOULD try to minimise try catch blocks 
+-> SHOULD implement all of the condition checking directly in the assembler                                                  OK
+-> SHOULD include details about instructions in readme               
 
 Probleme
 
 -> de fiecare data cand e 0xA in toWrite, asta adauga un 0xD inainte                                                         OK
-era problema cu modul de deschidere a fisierului, il deschideam si la inceput si la append in text mode 					 OK
--> Daca eu o linie de comment, ea este eliminata in vectorul care omite comentariile, dar                                    
+era problema cu modul de deschidere a fisierului, il deschideam si la inceput si la append in text mode 					 
+-> Daca eu o linie de comment, ea este eliminata in vectorul care omite comentariile, dar                                    OK
 linia de eroare (daca apare una) este eronata. 
--> Daca e o linie invalida / doar un spatiu => assertion failure!
+-> Daca e o linie invalida / doar un spatiu => assertion failure!                                                            OK
 -> std::invalid_argument daca sunt in mod exadecimal si e o problema cu sintaxa constantei (si are 0x in ea).                OK
 
 Nume: Olivetti A5BAL8/P101-C6502
@@ -37,8 +37,10 @@ cmake --build .
 #include <sstream>
 #include <algorithm>
 #include <stdio.h>
-#include "manip.h"
 #include <utility>
+#include "manip.h"
+
+
 
 int main(void) {
 	std::ifstream file("code.olvasm");
@@ -439,17 +441,87 @@ int main(void) {
 			} else printf("Line %d: Incorrect/Missing prefix for constant.\n", line.second);
 		}
 
-		else if( mnemonic == "DE1" || mnemonic == "de1" ) {
-			numberMode = 0;
-			printf("Number mode set to hexadecimal.\n");
+		else if ( mnemonic == "HLT" || mnemonic == "hlt" ) {
+			toWrite.push_back(0x11);
+			manip::write_binary(toWrite);
+			manip::printVector(toWrite);
 		}
 
-		else if( mnemonic == "DE2" || mnemonic == "de2" ) {
-			numberMode = 1;
-			printf("Number mode set to base 10.\n");
-		} else {
-			std::cout<< "Line " << line.second << ": <" << line.first << "> Syntax Error." << std::endl;
+		else if( mnemonic == "ON" || mnemonic == "on") {
+			if(manip::validate_expression(token[1], '$')) {
+				try{
+					int Constante = std::stoi( manip::remove_occurences(token[1], '$' ) );
+					if(Constante>=0 && Constante <=8) {
+						toWrite.push_back(0x12);
+						toWrite.push_back(Constante);
+						manip::write_binary(toWrite);
+						manip::printVector(toWrite);
+					} else printf("Line %d: Expected a value between 0 and 8.\n", line.second);
+				} catch(const std::invalid_argument& arg) {
+					printf("Line %d: Expected an integer.\n", line.second); 
+				}
+			}
 		}
+
+		else if( mnemonic == "OFF" || mnemonic == "off") {
+			if(manip::validate_expression(token[1], '$')) {
+				try{
+					int Constante = std::stoi( manip::remove_occurences(token[1], '$' ) );
+					if(Constante>=0 && Constante <=8) {
+						toWrite.push_back(0x14);
+						toWrite.push_back(Constante);
+						manip::write_binary(toWrite);
+						manip::printVector(toWrite);
+					} else printf("Line %d: Expected a value between 0 and 8.\n", line.second);
+				} catch(const std::invalid_argument& arg) {
+					printf("Line %d: Expected an integer.\n", line.second); 
+				}
+			}
+		}
+
+		else if( mnemonic == "FFO1" || mnemonic == "ffo1" ) {
+			numberMode = 0;
+			printf("Number mode set to hexadecimal.\n\n");
+		}
+
+		else if( mnemonic == "KEP" || mnemonic == "kep" ) {
+			toWrite.push_back(0x0F);
+			manip::write_binary(toWrite);
+			manip::printVector(toWrite);
+			printf("Output mode set to Terminal.\n\n");
+		}
+
+		else if( mnemonic == "KES" || mnemonic == "kes" ) {
+			toWrite.push_back(0x10);
+			manip::write_binary(toWrite);
+			manip::printVector(toWrite);
+			printf("Output mode set to Olivetti Display.\n");
+		}
+
+		else if( mnemonic == "STIO" || mnemonic == "stio" ) {      //     pentru assembler, mai incolo
+			printf("Start of Program.\n");
+		}
+		else if( mnemonic == "END" || mnemonic == "end" ) {      //     pentru assembler, mai incolo
+			toWrite.push_back(0x13);
+			manip::write_binary(toWrite);
+			manip::printVector(toWrite);
+			printf("\nEnd of Program.\n");
+		}
+
+		else if( mnemonic == "FFO2" || mnemonic == "ffo2" ) {
+			numberMode = 1;
+			printf("Number mode set to base 10.\n\n");
+		} 
+		
+		else if( mnemonic == "TITLE" || mnemonic == "title" ) {
+			size_t first =  token[1].find('\'');
+			size_t second = token[1].find('\'');
+
+			if( first != std::string::npos && second != std::string::npos ) {
+				std::cout << "Assembling '" << token[1].substr(first+1, second-first-1) << std::endl;
+			} else printf("Line %d: Syntax error for title.\n", current_line);
+		}
+		else std::cout<< "Line " << line.second << ": <" << line.first << "> Syntax Error." << std::endl;
 	}
 	return 0;
 }
